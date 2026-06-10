@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Quote" ALTER COLUMN "discount" DROP NOT NULL,
+ALTER COLUMN "discount" DROP DEFAULT,
+ALTER COLUMN "discount" SET DATA TYPE TEXT;

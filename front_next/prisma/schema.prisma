@@ -1,0 +1,189 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  CANCELLED
+  OVERDUE
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String?
+  email        String        @unique
+  password     String
+  role         Role          @default(USER)
+
+  companyName  String?
+  phone        String?
+  address      String?
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  clients      Client[]
+  quotes       Quote[]
+  invoices     Invoice[]
+}
+
+model Client {
+  id           String        @id @default(cuid())
+
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name         String
+  email        String?
+  phone        String?
+  company      String?
+  address      String?
+
+  notes        String?
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  quotes       Quote[]
+  invoices     Invoice[]
+}
+
+model Quote {
+  id              String          @id @default(cuid())
+
+  userId          String
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  clientId        String
+  client          Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  quoteNumber     String          @unique
+
+  title           String?
+  description     String?
+
+  subtotal        Float
+  tax             Float           @default(0)
+  discount        Float           @default(0)
+  total           Float
+
+  status          QuoteStatus     @default(DRAFT)
+
+  issueDate       DateTime
+  expiryDate      DateTime?
+
+  notes           String?
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  items           QuoteItem[]
+
+  invoice         Invoice?
+}
+
+model QuoteItem {
+  id              String      @id @default(cuid())
+
+  quoteId         String
+  quote           Quote       @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  label           String
+  description     String?
+
+  quantity        Int
+  unitPrice       Float
+  total           Float
+
+  createdAt       DateTime    @default(now())
+}
+
+model Invoice {
+  id              String           @id @default(cuid())
+
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  clientId        String
+  client          Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  quoteId         String?          @unique
+  quote           Quote?           @relation(fields: [quoteId], references: [id])
+
+  invoiceNumber   String           @unique
+
+  subtotal        Float
+  tax             Float            @default(0)
+  discount        Float            @default(0)
+  total           Float
+
+  status          InvoiceStatus    @default(PENDING)
+
+  dueDate         DateTime
+  paidAt          DateTime?
+
+  notes           String?
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  items           InvoiceItem[]
+
+  payments        Payment[]
+}
+
+model InvoiceItem {
+  id              String       @id @default(cuid())
+
+  invoiceId       String
+  invoice         Invoice      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  label           String
+  description     String?
+
+  quantity        Int
+  unitPrice       Float
+  total           Float
+
+  createdAt       DateTime     @default(now())
+}
+
+model Payment {
+  id              String          @id @default(cuid())
+
+  invoiceId       String
+  invoice         Invoice         @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  amount          Float
+
+  method          String?
+  reference       String?
+
+  paidAt          DateTime        @default(now())
+
+  createdAt       DateTime        @default(now())
+}
