@@ -27,7 +27,7 @@ export default function Sidebar(){
         },
         {
             label: "Settings",
-            href: "/component/project/settings",
+            href: "#",
             icon: "settings",
         },
     ];

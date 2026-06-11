@@ -8,9 +8,10 @@ import { ConfigModule } from '@nestjs/config';
 import { ClientModule } from './client/client.module';
 import { QuoteModule } from './quote/quote.module';
 import { InvoiceModule } from './invoice/invoice.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule,ClientModule,QuoteModule,InvoiceModule,
+  imports: [PrismaModule, AuthModule, UsersModule,ClientModule,QuoteModule,InvoiceModule,DashboardModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
