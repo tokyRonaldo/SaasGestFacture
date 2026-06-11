@@ -43,7 +43,6 @@ const register= ()=> {
                 throw new Error(data.message);
             }
 
-            alert('register avec succès');
 
             router.push('/component/auth/login');
 

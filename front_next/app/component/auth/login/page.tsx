@@ -53,7 +53,6 @@ const Login=()=>{
             'user',
             JSON.stringify(response.user)
             );
-            alert("login avec succès");
 
             router.push('/component/project/dashboard');
 
